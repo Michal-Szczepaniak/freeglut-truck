@@ -4,6 +4,9 @@
 
 /* Global variables */
 char title[] = "3D Shapes";
+int menuClicked = -1;
+
+int menuId;
 
 GLfloat calculateCubeBorder(GLfloat radius) {
     return static_cast<GLfloat>(radius * (sqrt(2) - 1) / sqrt(2));
@@ -36,24 +39,38 @@ void generateObject(GLfloat radius, GLfloat height, GLint points) {
 
 }
 
-/* Initialize OpenGL Graphics */
 void initGL() {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
-    glClearDepth(1.0f);                   // Set background depth to farthest
-    glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
-    glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearDepth(1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
 }
 
-/* Handler for window-repaint event. Called back when the window first appears and
-   whenever the window needs to be re-painted. */
 void display() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffers
-    glMatrixMode(GL_MODELVIEW);     // To operate on model-view matrix
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
 
     glLoadIdentity();
-//    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-//    glTranslatef(10.0f, 1.5f, 10.0f);
-    glTranslatef(-2.0f, 0.0f, 0.0f);
+    switch (menuClicked) {
+        case 0:
+            //top view
+            glTranslatef(-2.0f, -10.0f, -10.0f);
+            glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+            break;
+        case 1:
+            // front view
+            glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+            glTranslatef(10.0f, 1.0f, 10.0f);
+            break;
+        case 2:
+        default:
+            glTranslatef(-2.0f, 0.0f, 0.0f);
+            break;
+        case 3:
+            glRotatef(45.0f, 0.0f, 1.0f, 0.0f);
+            glTranslatef(5.0f, 0.5f, 5.0f);
+            break;
+    }
 
     glShadeModel(GL_SMOOTH);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -73,6 +90,42 @@ void display() {
     generateObject(1.0f, 2.2f, 4);
     glPopMatrix();
     // end cabin
+
+    // start light left
+    glPushMatrix();
+    glTranslatef(-3.05f + calculateCubeBorder(1.0f), -1.25f + calculateCubeBorder(1.0f)/4, -10.5f);
+    glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
+    generateObject(0.128f, 0.05f, 20);
+    glPopMatrix();
+    // end light left
+
+    // start light right
+    glPushMatrix();
+    glTranslatef(-3.05f + calculateCubeBorder(1.0f), -1.25f + calculateCubeBorder(1.0f)/4, -9.5f);
+    glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
+    generateObject(0.125f, 0.05f, 20);
+    glPopMatrix();
+    // end light right
+
+    // start exhaust
+    glPushMatrix();
+    glTranslatef(-1.8f + calculateCubeBorder(1.0f), -1.0f, -9.275f - calculateCubeBorder(1.0f));
+    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+    generateObject(0.125f, 0.5f, 20);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-1.8f + calculateCubeBorder(1.0f), -1.0f, -8.775f - calculateCubeBorder(1.0f));
+    glRotatef(45.0f, 1.0f, 0.0f, 0.0f);
+    glTranslated(0.0f, -0.088f, -0.038f);
+    generateObject(0.125f, 0.175f, 20);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-1.8f + calculateCubeBorder(1.0f), -1.0f, -8.775f - calculateCubeBorder(1.0f));
+    generateObject(0.125f, 2.5f, 20);
+    glPopMatrix();
+    // end exhaust
 
     // start front platform
     glPushMatrix();
@@ -206,42 +259,75 @@ void display() {
 
     // start input 1
     glPushMatrix();
-    glTranslatef(0.0f, 0.0f, -9.5f);
-//    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-    generateObject(0.5f, 0.25f, 20);
+    glTranslatef(0.0f, 0.4f, -10.0f);
+    generateObject(0.40f, 0.25f, 20);
     glPopMatrix();
-    // end back wheels
+    // end input 1
+
+    // start input 2
+    glPushMatrix();
+    glTranslatef(1.8f, 0.4f, -10.0f);
+    generateObject(0.40f, 0.25f, 20);
+    glPopMatrix();
+    // end input 2
+
+    // start input 3
+    glPushMatrix();
+    glTranslatef(3.6f, 0.4f, -10.0f);
+    generateObject(0.40f, 0.25f, 20);
+    glPopMatrix();
+    // end input 3
+
+    // start input 4
+    glPushMatrix();
+    glTranslatef(5.4f, 0.4f, -10.0f);
+    generateObject(0.40f, 0.25f, 20);
+    glPopMatrix();
+    // end input 4
 
     glutSwapBuffers();
 }
 
-/* Handler for window re-size event. Called back when the window first appears and
-   whenever the window is re-sized with its new width and height */
-void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integer
-    // Compute aspect ratio of the new window
-    if (height == 0) height = 1;                // To prevent divide by 0
+void menu(int value) {
+    menuClicked = value;
+
+    glutPostRedisplay();
+}
+
+void createMenu() {
+    menuId = glutCreateMenu(menu);
+
+    glutAddMenuEntry("Widok z gory", 0);
+    glutAddMenuEntry("Widok z przodu", 1);
+    glutAddMenuEntry("Widok z boku", 2);
+    glutAddMenuEntry("Widok pod katem", 3);
+
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+void reshape(GLsizei width, GLsizei height) {
+    if (height == 0) height = 1;
     GLfloat aspect = (GLfloat)width / (GLfloat)height;
 
-    // Set the viewport to cover the new window
     glViewport(0, 0, width, height);
 
-    // Set the aspect ratio of the clipping volume to match the viewport
-    glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
-    glLoadIdentity();             // Reset
-    // Enable perspective projection with fovy, aspect, zNear and zFar
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
     gluPerspective(45.0f, aspect, 0.1f, 100.0f);
 }
 
-/* Main function: GLUT runs as a console application starting at main() */
 int main(int argc, char** argv) {
-    glutInit(&argc, argv);            // Initialize GLUT
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); // Enable double buffered mode
-    glutInitWindowSize(640, 480);   // Set the window's initial width & height
-    glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
-    glutCreateWindow(title);          // Create window with the given title
-    glutDisplayFunc(display);       // Register callback handler for window re-paint event
-    glutReshapeFunc(reshape);       // Register callback handler for window re-size event
-    initGL();                       // Our own OpenGL initialization
-    glutMainLoop();                 // Enter the infinite event-processing loop
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(640, 480);
+    glutInitWindowPosition(50, 50);
+    glutCreateWindow(title);
+    createMenu();
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    initGL();
+    glutMainLoop();
+
     return 0;
 }
